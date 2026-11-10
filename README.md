@@ -4,7 +4,7 @@ A SunFounder GalaxyRVR kit turned into a small survey rover: a Raspberry Pi 5, a
 on two printed PLA plates. A laptop drives it over Wi-Fi, and it can map a room and drive itself to a point on the
 map. Built September to October 2026 as a learning vehicle for surveying a crawl space.
 
-**Project page with an interactive 3D model:** https://daniel-carrera.github.io/galaxyrvr-rover-build/
+**Project page with an interactive 3D model, the lidar map and a 3D depth view:** https://daniel-carrera.github.io/galaxyrvr-rover-build/
 
 <p>
   <img src="docs/assets/photos/rover-three-quarter.jpg" width="300" alt="The finished rover: six wheels, orange printed plates, the Pi and the lidar on top">
@@ -18,12 +18,14 @@ map. Built September to October 2026 as a learning vehicle for surveying a crawl
 | [BOM.md](BOM.md) | Parts list with links and what we paid |
 | [ASSEMBLY.md](ASSEMBLY.md) | Assembly steps, wiring, and the USB cable we modified |
 | [cad/](cad/) | The two printed parts as STL (print orientation) and STEP, and the FreeCAD script that builds them |
-| [docs/](docs/) | The project page (plain HTML, served by GitHub Pages) |
+| [docs/](docs/) | The project page (plain HTML, served by GitHub Pages); `docs/data/` holds the exported map and point cloud |
 
 ## What it has done
 
 - **2026-09-18:** drove itself to three points on a lidar map, 1.3 to 1.7 m away, and stopped within 100 mm of each
   (77, 66 and 53 mm by tape), at 20 % power with an operator holding a dead-man key.
+- **2026-09-15:** camera depth (Depth Anything V2) locked to the lidar and stitched along the drive into a 3D map
+  of the room, which the page shows as an interactive point cloud.
 - **2026-10-12:** first drives outdoors, over a phone hotspot with a proportional PS4 stick: two sessions, 222 s of
   driving, no faults.
 

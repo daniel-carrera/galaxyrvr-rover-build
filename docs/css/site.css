@@ -15,6 +15,11 @@
   --measure: 40rem;
   --wide: 74rem;
   --ok: #6fb1f7;
+  /* Go-to runs: categorical slots 1-3 of the reference palette, dark steps (validated on --bg-raised). */
+  --run-1: #3987e5;
+  --run-2: #d95926;
+  --run-3: #199e70;
+  --route: rgba(230, 236, 241, 0.42);
   color-scheme: dark;
 }
 
@@ -29,6 +34,10 @@ html[data-theme="light"] {
   --accent: #f26a0c;
   --accent-ink: #b0470a;
   --ok: #1e6bd0;
+  --run-1: #2a78d6;
+  --run-2: #eb6834;
+  --run-3: #1baf7a;
+  --route: rgba(22, 28, 34, 0.4);
   color-scheme: light;
 }
 
@@ -46,7 +55,42 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.site-header, main, .site-footer {
+.site-header, main, /* Lidar map */
+
+#map2d { display: block; width: 100%; height: auto; background: var(--bg-raised); border-radius: 2px; }
+#map2d .grid-img { image-rendering: pixelated; }
+html[data-theme="light"] #map2d .grid-img { filter: invert(1); }
+#map2d .route { fill: none; stroke: var(--route); stroke-width: 1.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+#map2d .run { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+#map2d .run.r1 { stroke: var(--run-1); } #map2d .run.r2 { stroke: var(--run-2); } #map2d .run.r3 { stroke: var(--run-3); }
+#map2d .goal { fill: none; stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+#map2d .stop { stroke: var(--bg-raised); stroke-width: 2; vector-effect: non-scaling-stroke; }
+#map2d .stop.r1 { fill: var(--run-1); } #map2d .stop.r2 { fill: var(--run-2); } #map2d .stop.r3 { fill: var(--run-3); }
+#map2d .goal-label { fill: var(--ink); font: 600 170px system-ui, sans-serif; paint-order: stroke; stroke: var(--bg-raised); stroke-width: 40px; }
+#map2d .keepout { fill: url(#hatch); stroke: var(--ink); stroke-dasharray: 4 3; stroke-width: 1; vector-effect: non-scaling-stroke; opacity: 0.75; }
+#map2d .hatch-line { stroke: var(--muted); stroke-width: 14; }
+#map2d .home { fill: var(--accent); }
+#map2d .scale { stroke: var(--muted); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+#map2d .scale-label, #map2d .home-label { fill: var(--muted); font: 140px system-ui, sans-serif; }
+#map2d .hit { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: default; vector-effect: non-scaling-stroke; }
+#map2d .hit-goal { fill: transparent; pointer-events: all; }
+#map2d g[hidden] { display: none; }
+.key { display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem; list-style: none; padding: 0; margin: 0 0 0.9rem; font-size: 0.85rem; color: var(--muted); }
+.key li { display: flex; align-items: center; gap: 0.45rem; margin: 0; }
+.swatch.route { background: var(--route); height: 2px; }
+.swatch.runs { background: linear-gradient(90deg, var(--run-1) 0 33%, var(--run-2) 33% 66%, var(--run-3) 66%); }
+.swatch.keepouts { border: 1px dashed var(--ink); }
+.swatch.line { height: 3px; width: 1.1rem; border-radius: 2px; }
+.swatch.depth-fused { background: linear-gradient(90deg, #6b5b4c, #a99b86, #d8d2c6); }
+.swatch.depth-lidar { background: var(--accent); }
+.swatch.depth-path { background: var(--ink); height: 2px; }
+.small { font-size: 0.84rem; }
+.narrow { max-width: 44rem; }
+.mini-facts { display: grid; gap: 0.45rem; margin: 0 0 0.9rem; }
+.mini-facts dt { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.mini-facts dd { margin: 0; }
+
+.site-footer {
   max-width: var(--wide);
   margin: 0 auto;
   padding-left: 1rem;

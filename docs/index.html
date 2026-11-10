@@ -29,6 +29,8 @@
     <li><a href="#assembly">Assembly</a></li>
     <li><a href="#cable">The USB cable</a></li>
     <li><a href="#software">Software</a></li>
+    <li><a href="#maps">Lidar map</a></li>
+    <li><a href="#depth">3D depth</a></li>
     <li><a href="#log">Log</a></li>
     <li><a href="#lessons">Lessons</a></li>
   </ul>
@@ -273,6 +275,72 @@
     <p class="muted">The code is not in this repository yet.</p>
   </section>
 
+  <section class="band" id="maps" aria-labelledby="maps-h">
+    <h2 id="maps-h">Lidar map and the first go-to runs</h2>
+    <p>The lidar sees one horizontal slice of the room, 183&nbsp;mm above the floor. We drove around the test room for a few minutes, stitched the scans together (scan matching with loop closure) and got this map at 25&nbsp;mm per cell. The rover then located itself on it with a particle filter and drove to three goals on its own, September 18, 2026.</p>
+    <div class="viewer-wrap">
+      <div class="stage frame" id="map-stage">
+        <svg id="map2d" role="img" aria-labelledby="map2d-title map2d-desc">
+          <title id="map2d-title">Lidar map of the test room with the mapping drive and three go-to runs</title>
+          <desc id="map2d-desc">Walls and furniture legs seen by the lidar, seen from above. The table below the map lists the three runs.</desc>
+        </svg>
+        <div class="tip" id="map-tip" hidden></div>
+      </div>
+      <aside class="panel" aria-label="Map layers">
+        <span class="control-label" id="map-show-label">Show</span>
+        <div class="chips" id="map-layers" role="group" aria-labelledby="map-show-label">
+          <button type="button" data-layer="route" aria-pressed="true"><span class="swatch route"></span>Mapping drive</button>
+          <button type="button" data-layer="runs" aria-pressed="true"><span class="swatch runs"></span>Go-to runs</button>
+          <button type="button" data-layer="keepouts" aria-pressed="true"><span class="swatch keepouts"></span>Keep-outs</button>
+        </div>
+        <ul class="key" id="map-key"></ul>
+        <p class="muted small">Each run's line is where the rover believed it was. Circles are 100&nbsp;mm around each goal. The dashed discs are things lower than the lidar's plane, a canister and a chair's star base, which we drew in by hand.</p>
+      </aside>
+    </div>
+    <div class="table-wrap narrow">
+      <table>
+        <thead><tr><th scope="col">Run</th><th scope="col" class="num">Goal distance</th><th scope="col" class="num">Time</th><th scope="col" class="num">Stopped from goal, by tape</th></tr></thead>
+        <tbody id="runs-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="band" id="depth" aria-labelledby="depth-h">
+    <h2 id="depth-h">Depth coverage in 3D</h2>
+    <p>The camera fills in what the lidar's single plane misses: table legs, boxes and everything between the floor and about 0.8&nbsp;m. Each camera frame gets a depth estimate from a neural network (Depth Anything V2, Large), scaled to agree with the lidar where its scan line crosses the image and with the floor, then placed along the path the lidar measured. This is 213 frames from a 71-second, 2.5&nbsp;m drive on September 15, 2026, kept at 2&nbsp;cm spacing.</p>
+    <div class="viewer-wrap">
+      <div class="stage frame" id="depth-stage">
+        <canvas id="depth3d" tabindex="0" aria-label="Interactive 3D point cloud of the test room built from the camera's depth and the lidar, with the lidar's scan slice and the rover's path."></canvas>
+        <p class="hint" id="depth-hint">Loading 1.7 MB of points…</p>
+      </div>
+      <aside class="panel" aria-label="Depth view controls">
+        <span class="control-label" id="depth-view-label">View</span>
+        <div class="seg" id="depth-views" role="group" aria-labelledby="depth-view-label">
+          <button type="button" data-view="overview" aria-pressed="true">Overview</button>
+          <button type="button" data-view="above" aria-pressed="false">From above</button>
+          <button type="button" data-view="rover" aria-pressed="false">Rover's eye</button>
+        </div>
+        <span class="control-label" id="depth-color-label">Colour</span>
+        <div class="seg" id="depth-color" role="group" aria-labelledby="depth-color-label">
+          <button type="button" data-color="camera" aria-pressed="true">Camera</button>
+          <button type="button" data-color="height" aria-pressed="false">Height</button>
+        </div>
+        <span class="control-label" id="depth-show-label">Show</span>
+        <div class="chips" id="depth-layers" role="group" aria-labelledby="depth-show-label">
+          <button type="button" data-layer="fused" aria-pressed="true"><span class="swatch depth-fused"></span>Camera depth</button>
+          <button type="button" data-layer="lidar" aria-pressed="true"><span class="swatch depth-lidar"></span>Lidar slice</button>
+          <button type="button" data-layer="path" aria-pressed="true"><span class="swatch depth-path"></span>Rover path</button>
+        </div>
+        <dl class="mini-facts">
+          <div><dt>Points</dt><dd class="num" id="depth-count">185,664</dd></div>
+          <div><dt>Fit to the lidar line</dt><dd class="num">11 mm median</dd></div>
+          <div><dt>Floor</dt><dd class="num">level within 0.5°</dd></div>
+        </dl>
+        <p class="muted small">An experiment, not a measurement: it was made before the camera recalibration of September 17, so it carries that 5&nbsp;% focal-length error, and there is no loop closure on this path.</p>
+      </aside>
+    </div>
+  </section>
+
   <section class="band" id="log" aria-labelledby="log-h">
     <h2 id="log-h">Log</h2>
     <ol class="timeline">
@@ -282,8 +350,9 @@
       <li><time datetime="2026-09-07">Sep 7</time><span>USB cable modified and checked; the Pi drives the motors through the R3 for the first time, wheels in the air.</span></li>
       <li><time datetime="2026-09-12">Sep 12</time><span>Plates printed and everything mounted and wired.</span></li>
       <li><time datetime="2026-09-13">Sep 13</time><span>Five-minute run driving with camera and lidar recording. The SD card started throwing write errors.</span></li>
+      <li><time datetime="2026-09-15">Sep 15</time><span>Camera depth fused with the lidar into a <a href="#depth">3D map</a> of the room.</span></li>
       <li><time datetime="2026-09-17">Sep 17</time><span>Camera recalibrated with tilted views of a printed target: the first calibration's focal length was about 5 % too high.</span></li>
-      <li><time datetime="2026-09-18">Sep 18</time><span>First drive to a point on the map by itself: three of three goals, 1.3 to 1.7 m away, reached within 100 mm (77, 66 and 53 mm by tape), at 20 % power with a hand on the dead-man key.</span></li>
+      <li><time datetime="2026-09-18">Sep 18</time><span>First drive to a point on the <a href="#maps">lidar map</a> by itself: three of three goals, 1.3 to 1.7 m away, reached within 100 mm (77, 66 and 53 mm by tape), at 20 % power with a hand on the dead-man key.</span></li>
       <li><time datetime="2026-10-12">Oct 12</time><span>First drives outdoors, over a phone hotspot with a proportional PS4 stick: two sessions, 222 s of driving, no faults.</span></li>
     </ol>
   </section>
@@ -303,10 +372,13 @@
 
 <footer class="site-footer">
   <p>Built on the <a href="https://www.sunfounder.com/">SunFounder</a> GalaxyRVR kit. Product names belong to their makers; links go to the makers' own pages.</p>
+  <p>The map and the point cloud are exported, downsampled, from the rover's recordings into <a href="https://github.com/daniel-carrera/galaxyrvr-rover-build/tree/main/docs/data"><code>docs/data/</code></a>: the occupancy grid as an image, the runs as JSON, and the points as 16-bit millimetres.</p>
   <p>Photos, CAD and text: MIT license, in the <a href="https://github.com/daniel-carrera/galaxyrvr-rover-build">repository</a>. The 3D view uses <a href="https://threejs.org/">three.js</a> (MIT), served from this site.</p>
 </footer>
 
 <script src="js/site.js"></script>
 <script type="module" src="js/viewer3d.js"></script>
+<script type="module" src="js/map2d.js"></script>
+<script type="module" src="js/depth3d.js"></script>
 </body>
 </html>
