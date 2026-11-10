@@ -6,10 +6,16 @@ map. Built September to October 2026 as a learning vehicle for surveying a crawl
 
 **Project page with an interactive 3D model, the lidar map and a 3D depth view:** https://daniel-carrera.github.io/galaxyrvr-rover-build/
 
-<p>
-  <img src="docs/assets/photos/rover-three-quarter.jpg" width="300" alt="The finished rover: six wheels, orange printed plates, the Pi and the lidar on top">
-  <img src="docs/assets/renders/payload-exploded.png" width="360" alt="Exploded 3D view of the payload: lower plate, boards, standoffs, lidar carrier and lidar">
-</p>
+<table>
+  <tr>
+    <td><img src="docs/assets/photos/rover-three-quarter.jpg" width="360" alt="The finished rover: six wheels, orange printed plates, the Pi and the lidar on top"></td>
+    <td><img src="docs/assets/renders/payload-exploded.png" width="360" alt="Exploded 3D view of the payload: lower plate, boards, standoffs, lidar carrier and lidar"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>The finished rover, 2026-09-12</sub></td>
+    <td align="center"><sub>The payload exploded: printed parts in orange, boards as simple blocks</sub></td>
+  </tr>
+</table>
 
 ## What is here
 
