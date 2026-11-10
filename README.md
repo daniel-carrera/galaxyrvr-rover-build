@@ -8,12 +8,12 @@ map. Built September to October 2026 as a learning vehicle for surveying a crawl
 
 <table>
   <tr>
-    <td><img src="docs/assets/photos/rover-three-quarter.jpg" width="360" alt="The finished rover: six wheels, orange printed plates, the Pi and the lidar on top"></td>
-    <td><img src="docs/assets/renders/payload-exploded.png" width="360" alt="Exploded 3D view of the payload: lower plate, boards, standoffs, lidar carrier and lidar"></td>
+    <td width="50%"><img src="docs/assets/photos/rover-three-quarter.jpg" width="360" alt="The finished rover: six wheels, orange printed plates, the Pi and the lidar on top"></td>
+    <td width="50%"><img src="docs/assets/renders/payload-exploded.png" width="360" alt="Exploded 3D view of the payload: lower plate, boards, standoffs, lidar carrier and lidar"></td>
   </tr>
   <tr>
-    <td align="center"><sub>The finished rover, 2026-09-12</sub></td>
-    <td align="center"><sub>The payload exploded: printed parts in orange, boards as simple blocks</sub></td>
+    <td width="50%" align="center"><sub>The finished rover, 2026-09-12</sub></td>
+    <td width="50%" align="center"><sub>The payload exploded: printed parts in orange, boards as simple blocks</sub></td>
   </tr>
 </table>
 
