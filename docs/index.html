@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; media-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'none'">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0e1318">
+<meta name="description" content="A SunFounder GalaxyRVR kit turned into a lidar and camera survey rover with a Raspberry Pi 5: printed parts, parts list, assembly, and what it has done.">
+<title>GalaxyRVR survey rover</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='5' width='12' height='6' rx='1.5' fill='%23ff7a1a'/%3E%3Ccircle cx='4' cy='13' r='2' fill='%23ff7a1a'/%3E%3Ccircle cx='12' cy='13' r='2' fill='%23ff7a1a'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/site.css">
+<script src="js/theme.js"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="topline">
+    <p class="kicker">Rover build log, September to October 2026 &middot; <a href="https://github.com/daniel-carrera/galaxyrvr-rover-build">CAD and notes on GitHub</a></p>
+    <button class="theme-toggle" type="button" hidden>Light mode</button>
+  </div>
+  <h1>A survey rover from a GalaxyRVR kit</h1>
+  <p class="lede">We took SunFounder's six-wheel GalaxyRVR, dropped the solar panel, and put a Raspberry Pi&nbsp;5, a 12&nbsp;MP wide camera and a 360° lidar on two printed PLA plates. A laptop drives it over Wi-Fi, and it can map a room and drive itself to a point on the map.</p>
+  <p class="context">It is a learning vehicle for surveying a crawl space. Everything here was built and measured on a hobby budget.</p>
+  <ul class="toc">
+    <li><a href="#model">3D model</a></li>
+    <li><a href="#parts">Parts list</a></li>
+    <li><a href="#printed">Printed parts</a></li>
+    <li><a href="#assembly">Assembly</a></li>
+    <li><a href="#cable">The USB cable</a></li>
+    <li><a href="#software">Software</a></li>
+    <li><a href="#log">Log</a></li>
+    <li><a href="#lessons">Lessons</a></li>
+  </ul>
+</header>
+
+<main>
+
+  <div class="hero">
+    <figure>
+      <div class="frame"><img src="assets/photos/rover-three-quarter.jpg" width="1200" height="1600" alt="The rover on a table: six black wheels on a silver chassis, an orange printed plate carrying the Raspberry Pi and the controller board, and the black round lidar on a raised orange plate at the back."></div>
+      <figcaption>The finished rover, September 12, 2026.</figcaption>
+    </figure>
+    <div>
+      <figure>
+        <div class="frame">
+          <video data-autoplay muted loop playsinline preload="none" poster="assets/video/garden-drive-2x.jpg" width="960" height="540" aria-label="The rover's camera view, close to the ground, driving down a gravel side yard between a wooden retaining wall and a hedge.">
+            <source src="assets/video/garden-drive-2x.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption>The rover's own camera on its first outdoor drive, October 12, 2026, at twice real speed. Driven with a PS4 controller over a phone hotspot.</figcaption>
+      </figure>
+      <dl class="facts">
+        <div><dt>Drive</dt><dd>6 wheels<small>skid steer, TT motors</small></dd></div>
+        <div><dt>Computer</dt><dd>Pi 5, 8 GB<small>own battery</small></dd></div>
+        <div><dt>Lidar plane</dt><dd>183 mm<small>above the floor</small></dd></div>
+        <div><dt>First go-to</dt><dd>3 of 3<small>within 100 mm, by tape</small></dd></div>
+        <div><dt>Parts cost</dt><dd>≈ $280<small>new parts; <a href="#parts">see list</a></small></dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <section class="band" id="model" aria-labelledby="model-h">
+    <h2 id="model-h">3D model</h2>
+    <p>The two orange parts are the printed plates, the same files you can download. The translucent blocks are simplified envelopes of the boards, the lidar and the standoffs, placed from the build's measurements.</p>
+    <div class="viewer-wrap">
+      <div class="stage frame" id="stage">
+        <canvas id="viewer" tabindex="0" aria-label="Interactive 3D model of the rover's payload: the printed lower plate, four standoffs, the printed lidar carrier, and simplified boxes for the Raspberry Pi, the controller board, the camera bracket and the lidar."></canvas>
+        <div class="tip" id="tip" hidden></div>
+        <p class="hint" id="hint">Drag to turn, scroll or pinch to zoom, right-drag to pan.</p>
+        <noscript><p class="note">The 3D view needs JavaScript and WebGL. The STL and STEP files are linked beside it.</p></noscript>
+      </div>
+      <aside class="panel" aria-label="Model controls">
+        <span class="control-label" id="view-label">View</span>
+        <div class="seg" id="views" role="group" aria-labelledby="view-label">
+          <button type="button" data-view="assembled" aria-pressed="true">Assembled</button>
+          <button type="button" data-view="exploded" aria-pressed="false">Exploded</button>
+          <button type="button" data-view="top" aria-pressed="false">From above</button>
+        </div>
+        <span class="control-label" id="show-label">Show</span>
+        <div class="chips" id="layers" role="group" aria-labelledby="show-label">
+          <button type="button" data-layer="printed" aria-pressed="true"><span class="swatch" data-swatch="printed"></span>Printed</button>
+          <button type="button" data-layer="hardware" aria-pressed="true"><span class="swatch" data-swatch="hardware"></span>Standoffs</button>
+          <button type="button" data-layer="boards" aria-pressed="true"><span class="swatch" data-swatch="boards"></span>Boards</button>
+          <button type="button" data-layer="lidar" aria-pressed="true"><span class="swatch" data-swatch="lidar"></span>Lidar</button>
+        </div>
+        <span class="control-label">Files</span>
+        <ul class="parts-list">
+          <li><span>Lower plate <span class="muted num">179.5 × 93 × 7 mm</span></span>
+            <span class="dl"><a href="https://github.com/daniel-carrera/galaxyrvr-rover-build/raw/main/cad/stl/lower-plate.stl">STL</a><a href="https://github.com/daniel-carrera/galaxyrvr-rover-build/raw/main/cad/step/lower-plate.step">STEP</a></span>
+            <small>Carries the Pi, the controller board and the camera bracket. Prints top face down.</small></li>
+          <li><span>Lidar carrier <span class="muted num">69 × 92 × 4 mm</span></span>
+            <span class="dl"><a href="https://github.com/daniel-carrera/galaxyrvr-rover-build/raw/main/cad/stl/lidar-carrier.stl">STL</a><a href="https://github.com/daniel-carrera/galaxyrvr-rover-build/raw/main/cad/step/lidar-carrier.step">STEP</a></span>
+            <small>Holds the lidar 45 mm above the plate, clear of the boards and cables. Prints flat.</small></li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="band" id="parts" aria-labelledby="parts-h">
+    <h2 id="parts-h">Parts list</h2>
+    <p>Prices are what we paid, where we recorded them. Parts we already owned have no price.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Part</th><th scope="col">Role</th><th scope="col" class="num">Qty</th><th scope="col" class="num">Paid</th></tr></thead>
+        <tbody>
+          <tr class="group"><td colspan="4">Base</td></tr>
+          <tr><td><a href="https://docs.sunfounder.com/projects/galaxy-rvr/en/latest/">SunFounder GalaxyRVR kit</a></td><td>Chassis, six TT motors, Arduino-compatible R3 board, GalaxyRVR shield, battery. Solar panel left off.</td><td class="num">1</td><td class="num">≈ $130</td></tr>
+          <tr class="group"><td colspan="4">Computer and power</td></tr>
+          <tr><td><a href="https://www.raspberrypi.com/products/raspberry-pi-5/">Raspberry Pi 5, 8 GB</a></td><td>Records camera and lidar, relays drive commands</td><td class="num">1</td><td class="num">owned</td></tr>
+          <tr><td>Pi case base with active cooler</td><td>Cooling under load</td><td class="num">1</td><td class="num">owned</td></tr>
+          <tr><td>microSD card, 128 GB, A2</td><td>Boot and storage. <small>Our first card failed; see lessons.</small></td><td class="num">1</td><td class="num">owned</td></tr>
+          <tr><td><a href="https://52pi.com/collections/hat-addons/products/52pi-pd-power-extension-adapter-board-for-raspberry-pi-5">52Pi EP-0225 USB-C PD board</a></td><td>Takes 15 V USB-C PD, gives the Pi a regulated 5 V</td><td class="num">1</td><td class="num">$29.99</td></tr>
+          <tr><td><a href="https://www.anker.com/products/a1664-maggo-10000mah-power-bank">Anker MagGo A1664 power bank</a></td><td>The Pi's own battery, 39 Wh</td><td class="num">1</td><td class="num">owned</td></tr>
+          <tr class="group"><td colspan="4">Sensors</td></tr>
+          <tr><td><a href="https://www.arducam.com/12mp-imx708-autofocus-wide-angle-camera-module-3-for-raspberry-pi-hdr-mode-and-pdaf-supported.html">Arducam B031202, 12 MP IMX708</a></td><td>Front camera, 120° diagonal, autofocus</td><td class="num">1</td><td class="num">$44.99</td></tr>
+          <tr><td><a href="https://www.slamtec.com/en/c1/">SLAMTEC RPLIDAR C1 kit</a></td><td>360° single-plane lidar, with its USB adapter</td><td class="num">1</td><td class="num">$74.99</td></tr>
+          <tr class="group"><td colspan="4">Printed and hardware</td></tr>
+          <tr><td><a href="#printed">Lower plate</a>, PLA</td><td>Payload deck on the chassis</td><td class="num">1</td><td class="num">printed</td></tr>
+          <tr><td><a href="#printed">Lidar carrier</a>, PLA</td><td>Raised lidar deck</td><td class="num">1</td><td class="num">printed</td></tr>
+          <tr><td>M3 metal standoffs, 45 mm stack</td><td>Lidar carrier supports</td><td class="num">4</td><td class="num">owned</td></tr>
+          <tr><td>M3 flat-head socket screws and nuts</td><td>Camera bracket (2) and standoff bases (4), up from below</td><td class="num">6</td><td class="num">owned</td></tr>
+          <tr><td>M3 screws and hex nuts</td><td>Controller board into captive nuts under the plate</td><td class="num">4</td><td class="num">owned</td></tr>
+          <tr><td>M3 screws</td><td>Plate to chassis (4), carrier to standoffs (4)</td><td class="num">8</td><td class="num">owned</td></tr>
+          <tr><td>M2.5 button-head socket screws</td><td>Pi, up through the plate into the EP-0225 standoffs</td><td class="num">4</td><td class="num">owned</td></tr>
+          <tr><td>M2.5 screws</td><td>Lidar to carrier, from below, at most 4 mm into the lidar</td><td class="num">4</td><td class="num">owned</td></tr>
+          <tr class="group"><td colspan="4">Cables and control</td></tr>
+          <tr><td>USB-A to USB-B cable, <a href="#cable">5 V wire cut</a></td><td>Pi to controller board: data and ground only</td><td class="num">1</td><td class="num">owned</td></tr>
+          <tr><td>PS4 DualShock 4 controller</td><td>Plugged into the laptop for driving</td><td class="num">1</td><td class="num">owned</td></tr>
+        </tbody>
+        <tfoot><tr><td colspan="3">New parts bought for this build</td><td class="num">≈ $280</td></tr></tfoot>
+      </table>
+    </div>
+    <p class="muted">Screw lengths were not recorded; measure against your own stack. The kit's ESP32 camera is disconnected from the shield.</p>
+
+    <h3>Two batteries, kept apart</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 760 230" role="img" aria-labelledby="power-title power-desc">
+        <title id="power-title">Power and data wiring</title>
+        <desc id="power-desc">The rover battery powers the GalaxyRVR shield, which powers the R3 board and the six motors. The power bank powers the EP-0225 at 15 volts, which powers the Pi at 5 volts. The Pi runs the camera and the lidar. The Pi and the R3 are joined by a USB cable that carries data and ground only; its 5 volt wire is cut.</desc>
+        <rect class="box rover" x="10" y="20" width="150" height="46" rx="4"/><text x="22" y="40">Rover battery</text><text class="sub" x="22" y="56">stock pack</text>
+        <rect class="box rover" x="10" y="92" width="150" height="46" rx="4"/><text x="22" y="112">GalaxyRVR shield</text><text class="sub" x="22" y="128">motor drivers</text>
+        <rect class="box rover" x="10" y="164" width="150" height="46" rx="4"/><text x="22" y="184">R3 board + 6 motors</text><text class="sub" x="22" y="200">guarded drive firmware</text>
+        <path class="wire power-rover" d="M85 66 V92 M85 138 V164"/>
+        <rect class="box pi" x="600" y="20" width="150" height="46" rx="4"/><text x="612" y="40">Anker power bank</text><text class="sub" x="612" y="56">USB-C PD</text>
+        <rect class="box pi" x="600" y="92" width="150" height="46" rx="4"/><text x="612" y="112">52Pi EP-0225</text><text class="sub" x="612" y="128">15 V in, 5 V out</text>
+        <rect class="box pi" x="600" y="164" width="150" height="46" rx="4"/><text x="612" y="184">Raspberry Pi 5</text><text class="sub" x="612" y="200">8 GB</text>
+        <path class="wire power-pi" d="M675 66 V92 M675 138 V164"/>
+        <rect class="box" x="400" y="92" width="150" height="46" rx="4"/><text x="412" y="112">Camera and lidar</text><text class="sub" x="412" y="128">CSI ribbon, USB</text>
+        <path class="wire" d="M600 187 H575 V115 H550"/>
+        <path class="wire data" d="M160 187 H600"/>
+        <path class="cut" d="M372 176 L384 198 M380 176 L392 198"/>
+        <text class="sub" x="300" y="222">USB: data and ground only, 5 V wire cut</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="band" id="printed" aria-labelledby="printed-h">
+    <h2 id="printed-h">Printed parts</h2>
+    <p>Both parts were printed in PLA on a Bambu Lab A1 mini. The lower plate takes the solar panel's place and bolts into the chassis's existing threaded holes. A 21&nbsp;mm channel under the plate clears the chassis strip and keeps the top flat.</p>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr><th scope="row">Material</th><td>PLA</td></tr>
+          <tr><th scope="row">Walls, infill</th><td>4 wall loops, 15 % gyroid</td></tr>
+          <tr><th scope="row">Around holes</th><td>Slicer modifiers at every through-hole</td></tr>
+          <tr><th scope="row">Orientation</th><td>Lower plate top face down, so the nut pockets and channel print facing up. Carrier flat.</td></tr>
+          <tr><th scope="row">Fasteners</th><td>No heat-set inserts: captive M3 nuts, countersunk screws from below, and the EP-0225's own standoffs</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pair">
+      <figure>
+        <img src="assets/photos/chassis-measurements.jpg" width="1292" height="1600" loading="lazy" alt="A photo of the bare aluminum chassis on graph paper, marked up by hand with hole positions and distances in millimetres, with two close-ups of a standoff and a nut.">
+        <figcaption>The plate is drawn from hand measurements of the chassis, September 8.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/photos/nut-pocket-coupon.jpg" width="1050" height="1400" loading="lazy" alt="A small orange printed test plate held in a hand, with rows of hexagonal nut pockets for M2 to M5 at three different clearances, some with nuts pressed in.">
+        <figcaption>A test coupon of M2 to M5 nut pockets at three clearances, printed to choose the pocket size, September 11.</figcaption>
+      </figure>
+    </div>
+    <p class="muted">The files here are rebuilt from the build's measured specification by <a href="https://github.com/daniel-carrera/galaxyrvr-rover-build/blob/main/cad/build_parts.py"><code>cad/build_parts.py</code></a> (FreeCAD). They include one change made after printing: the camera bracket holes sit 5&nbsp;mm farther along the plate's width, where we re-drilled them to clear the Pi's power cable. Two walls are thinner than our own 2.5 and 3&nbsp;mm minimums: between two nut pockets and the channel (1.1&nbsp;mm), and the roof over two Pi screw pockets inside the channel (2.6&nbsp;mm).</p>
+  </section>
+
+  <section class="band" id="assembly" aria-labelledby="assembly-h">
+    <h2 id="assembly-h">Assembly</h2>
+    <ol class="steps">
+      <li><strong>Build the kit</strong> with <a href="https://docs.sunfounder.com/projects/galaxy-rvr/en/v1/assemble_video.html">SunFounder's assembly video</a>, but leave off the solar panel and its mount. Its space becomes the payload deck.</li>
+      <li><strong>Print</strong> the lower plate and the lidar carrier.</li>
+      <li><strong>Press four M3 nuts</strong> into the hex pockets under the plate, for the controller board.</li>
+      <li><strong>Fit the camera bracket and the four standoff bases</strong> with M3 countersunk screws pointing up from under the plate, nuts on top. Build each standoff stack to 45&nbsp;mm.</li>
+      <li><strong>Mount the Pi with the EP-0225 on it</strong>: four M2.5 button heads up through the plate into the EP-0225's standoffs. Do this before the plate goes on the chassis, which covers those screw heads.</li>
+      <li><strong>Mount the R3 board and shield</strong> under where the lidar will be, with M3 screws from the top into the captive nuts.</li>
+      <li><strong>Bolt the plate to the chassis</strong> with four M3 screws into the chassis threads. The channel underneath sits over the chassis strip, and the 8&nbsp;mm hole clears its center screw.</li>
+      <li><strong>Fit the lidar</strong> to the carrier with four M2.5 screws from below, then screw the carrier onto the standoffs from above.</li>
+      <li><strong>Connect the camera</strong> to the Pi's CAM/DISP 0 port with a 22-pin Pi 5 ribbon. Never plug it into the kit's ESP32 camera connector: it looks similar and is not compatible.</li>
+      <li><strong>Wire it up</strong>: lidar USB adapter to a Pi USB 2 port, wrapped in film and taped where it touches the chassis; R3 to the Pi with the <a href="#cable">modified cable</a>; power bank to the EP-0225's USB-C input.</li>
+      <li><strong>Before every drive</strong>: both batteries strapped down, loose cable coiled away from the wheels and suspension, and nothing in the lidar's scan plane.</li>
+    </ol>
+    <div class="gallery">
+      <figure>
+        <img src="assets/photos/stock-rover-top.jpg" width="1050" height="1400" loading="lazy" alt="The stock rover from above before the payload: the GalaxyRVR shield, two infrared sensors, the ESP32 camera and the ultrasonic sensor on the aluminum chassis.">
+        <figcaption>Before: the stock kit, September 2.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/photos/rover-front.jpg" width="1050" height="1400" loading="lazy" alt="The rover from the front: the camera on its bracket at the front of the orange plate, the Pi behind it, and the lidar on the raised carrier.">
+        <figcaption>From the front. The camera moved 5 mm after this photo.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/photos/rover-rear.jpg" width="1050" height="1400" loading="lazy" alt="The rover from the back: the lidar cable coiled and the lidar's small green USB adapter at the rear.">
+        <figcaption>From the back, with the lidar's USB adapter.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/photos/lidar-adapter-insulation.jpg" width="1050" height="1400" loading="lazy" alt="Close-up of the lidar's green USB adapter board wrapped in clear plastic film, resting on black insulation tape on the aluminum chassis.">
+        <figcaption>The lidar adapter wrapped in film, with tape where it rests on the chassis.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/photos/pi-power-bench.jpg" width="1050" height="1400" loading="lazy" alt="On a bench: the power bank connected through a USB power meter to the EP-0225 board, which powers the Pi 5 in its case with the cooler fitted.">
+        <figcaption>Pi power checked on the bench first: power bank, USB meter, EP-0225, Pi. September 6.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/photos/rover-test-room.jpg" width="1400" height="1050" loading="lazy" alt="The rover on a wooden floor in a room, with desk legs and a storage bag in the background.">
+        <figcaption>In the test room where it mapped and drove itself.</figcaption>
+      </figure>
+    </div>
+    <h3>The main parts before mounting</h3>
+    <div class="trio">
+      <figure><img src="assets/photos/part-rplidar-c1.jpg" width="750" height="1000" loading="lazy" alt="The RPLIDAR C1 with its cable, a USB cable and its small USB adapter board."><figcaption>RPLIDAR C1 kit</figcaption></figure>
+      <figure><img src="assets/photos/part-imx708.jpg" width="750" height="1000" loading="lazy" alt="The Arducam IMX708 camera board with two ribbon cables."><figcaption>Arducam IMX708 and ribbons</figcaption></figure>
+      <figure><img src="assets/photos/part-ep-0225.jpg" width="750" height="1000" loading="lazy" alt="The black 52Pi EP-0225 power board in its antistatic bag."><figcaption>52Pi EP-0225</figcaption></figure>
+      <figure><img src="assets/photos/part-pi5-cooler.jpg" width="750" height="1000" loading="lazy" alt="The Raspberry Pi 5 in a black case base with the active cooler fitted."><figcaption>Pi 5 with active cooler</figcaption></figure>
+      <figure><img src="assets/photos/part-r3-board.jpg" width="750" height="1000" loading="lazy" alt="The blue Arduino-compatible R3 board from the kit."><figcaption>The kit's R3 board</figcaption></figure>
+      <figure><img src="assets/photos/part-shield.jpg" width="750" height="1000" loading="lazy" alt="The black GalaxyRVR shield on the chassis with many wires plugged in."><figcaption>GalaxyRVR shield</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="band" id="cable" aria-labelledby="cable-h">
+    <h2 id="cable-h">The USB cable we cut</h2>
+    <p>The Pi sends drive commands to the R3 board over USB. But the R3's USB port is also powered by the rover's battery, through the shield. With the rover switched on and nothing else connected, a USB meter on the R3's cable read <strong class="num">5.13&nbsp;V</strong>. Plugged into the Pi, that cable would have tied the rover's 5&nbsp;V to the Pi's own supply, and current could flow back into the Pi.</p>
+    <p>So on a spare USB-A to USB-B cable we opened the jacket and cut the red wire, the 5&nbsp;V line (VBUS). Both cut ends were insulated and the section taped closed. White (D−), green (D+) and black (ground) stay connected: the two boards share data and ground, never power.</p>
+    <h3>How we checked it</h3>
+    <p>Voltage with a POWER-Z KM003C USB meter; the wires with a multimeter in continuity (beep) mode, cable unplugged at both ends.</p>
+    <div class="table-wrap">
+      <table class="checks">
+        <thead><tr><th scope="col">Check</th><th scope="col">How</th><th scope="col">Result</th></tr></thead>
+        <tbody>
+          <tr><td>Back-feed, stock cable</td><td>Rover on, R3 → cable → meter, other end free</td><td><span class="num">5.13 V</span></td></tr>
+          <tr><td>Back-feed, cut cable</td><td>Same setup with the modified cable</td><td><span class="pass">Meter stays dark</span></td></tr>
+          <tr><td>5 V end to end</td><td>A pin 1 → B pin 1</td><td><span class="pass">Open</span></td></tr>
+          <tr><td>Ground</td><td>A pin 4 → B pin 4</td><td><span class="pass">Beeps</span></td></tr>
+          <tr><td>Data</td><td>A pin 2 → B pin 2 (D−), A pin 3 → B pin 3 (D+)</td><td><span class="pass">Both beep</span></td></tr>
+          <tr><td>No short</td><td>5 V to ground, at each plug</td><td><span class="pass">Open</span></td></tr>
+          <tr><td>Talks to a laptop</td><td>Laptop → cable → R3 running a test firmware with the motors disabled</td><td><span class="pass">4 of 4 replies correct</span></td></tr>
+          <tr><td>Talks to the Pi</td><td>Pi → cable → R3, wheels off the ground</td><td><span class="pass">One 200 ms pulse, then stopped by itself</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="trio">
+      <figure><img src="assets/photos/usb-backfeed-reading.jpg" width="900" height="1200" loading="lazy" alt="A POWER-Z USB meter reading 5.129554 volts, 0 amps, 0 watts, held up with nothing plugged into its far end."><figcaption>5.13 V coming out of the rover's USB port, with no computer attached. September 7.</figcaption></figure>
+      <figure><img src="assets/photos/usb-meter-setup.jpg" width="900" height="1200" loading="lazy" alt="The POWER-Z meter on the end of a blue USB cable through a USB-A to USB-C adapter."><figcaption>The meter is USB-C, so the cable's USB-A plug goes through an adapter.</figcaption></figure>
+      <figure><img src="assets/photos/usb-r3-port.jpg" width="900" height="1200" loading="lazy" alt="The blue USB-B plug in the R3 board's USB port, under the shield."><figcaption>The R3's USB-B port, under the shield.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="band" id="software" aria-labelledby="software-h">
+    <h2 id="software-h">Software</h2>
+    <p>Plain Python, no ROS. Three computers, each with one job:</p>
+    <ul>
+      <li><strong>R3 board</strong>: small custom firmware. It moves only after an ARM command, and a drive command lapses unless the next one arrives in time; a watchdog stops the motors if the link goes quiet.</li>
+      <li><strong>Raspberry Pi</strong>: records the camera and lidar, and passes drive commands to the R3 only while its own health checks pass.</li>
+      <li><strong>Laptop</strong>: the operator's page and PS4 controller, and the navigation: a lidar map built from a driven recording, a particle filter to find the rover on it, and A* to plan a path.</li>
+    </ul>
+    <p class="muted">The code is not in this repository yet.</p>
+  </section>
+
+  <section class="band" id="log" aria-labelledby="log-h">
+    <h2 id="log-h">Log</h2>
+    <ol class="timeline">
+      <li><time datetime="2026-09-02">Sep 2</time><span>Kit built and driven with SunFounder's app.</span></li>
+      <li><time datetime="2026-09-05">Sep 5</time><span>Driven from a laptop page with a PS4 controller, through the kit's ESP32 link.</span></li>
+      <li><time datetime="2026-09-06">Sep 6</time><span>Pi 5 boots from the power bank through the EP-0225 and holds about 5.05 V through a ten-minute CPU load.</span></li>
+      <li><time datetime="2026-09-07">Sep 7</time><span>USB cable modified and checked; the Pi drives the motors through the R3 for the first time, wheels in the air.</span></li>
+      <li><time datetime="2026-09-12">Sep 12</time><span>Plates printed and everything mounted and wired.</span></li>
+      <li><time datetime="2026-09-13">Sep 13</time><span>Five-minute run driving with camera and lidar recording. The SD card started throwing write errors.</span></li>
+      <li><time datetime="2026-09-17">Sep 17</time><span>Camera recalibrated with tilted views of a printed target: the first calibration's focal length was about 5 % too high.</span></li>
+      <li><time datetime="2026-09-18">Sep 18</time><span>First drive to a point on the map by itself: three of three goals, 1.3 to 1.7 m away, reached within 100 mm (77, 66 and 53 mm by tape), at 20 % power with a hand on the dead-man key.</span></li>
+      <li><time datetime="2026-10-12">Oct 12</time><span>First drives outdoors, over a phone hotspot with a proportional PS4 stick: two sessions, 222 s of driving, no faults.</span></li>
+    </ol>
+  </section>
+
+  <section class="band" id="lessons" aria-labelledby="lessons-h">
+    <h2 id="lessons-h">Lessons</h2>
+    <ul>
+      <li><strong>Measure before you connect two boards.</strong> A USB port can be a power source. Five minutes with a meter found the back-feed above.</li>
+      <li><strong>The SD card was the weakest part.</strong> Continuous camera and lidar recording stalled the first card and then gave write errors. We now record to RAM and copy off at the end, and ordered the official Raspberry Pi card to replace it.</li>
+      <li><strong>A single-plane lidar is blind below its plane.</strong> At 183 mm it missed a 178 mm cylinder and a chair's star base. We mark those as keep-out zones on the map by hand.</li>
+      <li><strong>Without wheel encoders, the motion model is a guess.</strong> The rover drove 29 % faster than its model said, and overshot every goal by 51 to 64 mm along its heading.</li>
+      <li><strong>Tilt the calibration target.</strong> Our first camera calibration used almost straight-on views and came out 5 % off; only a cross-check against the lidar showed it.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>Built on the <a href="https://www.sunfounder.com/">SunFounder</a> GalaxyRVR kit. Product names belong to their makers; links go to the makers' own pages.</p>
+  <p>Photos, CAD and text: MIT license, in the <a href="https://github.com/daniel-carrera/galaxyrvr-rover-build">repository</a>. The 3D view uses <a href="https://threejs.org/">three.js</a> (MIT), served from this site.</p>
+</footer>
+
+<script src="js/site.js"></script>
+<script type="module" src="js/viewer3d.js"></script>
+</body>
+</html>
